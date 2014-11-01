@@ -63,7 +63,7 @@ sub do_detail
 		$row{$k} = $v;
 	}
 
-	$dt->insert (\%row);
+	$dt->upsert (\%row);
 }
 
 # Roll!
@@ -84,4 +84,6 @@ do {
 		# Destroy the agent, we're done.
 		$mech = undef;
 	}
-} while ($mech)
+} while ($mech);
+
+$dt->create_index(['Vyhlásenie konania'], undef, 'IF NOT EXISTS', 'UNIQUE');
