@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-use lib '/home/lkundrak/src/perl-database-dumptruck/lib';
-
 use URI;
 use WWW::Mechanize;
 use HTML::TreeBuilder 5 -weak;
