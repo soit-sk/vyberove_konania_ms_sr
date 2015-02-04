@@ -10,6 +10,9 @@ use WWW::Mechanize;
 use HTML::TreeBuilder 5 -weak;
 use Database::DumpTruck;
 
+use utf8;
+use Unicode::Normalize;
+
 my $root = new URI ('http://www.justice.gov.sk/Stranky/Ministerstvo/Vyberove-konania-v-rezorte/Zoznam-vyberovych-konani.aspx');
 my $mech = new WWW::Mechanize;
 my $dt = new Database::DumpTruck ({ dbname => 'data.sqlite', table => 'swdata' });
@@ -60,10 +63,16 @@ sub do_detail
 		$v = new URI ($link->[0])->abs ($resp->request->uri)->as_string
 			if $link;
 
-		$row{$k} = $v;
+		# Remove diacritics and remove spaces and slashes
+		# so we can use data from page to create columns
+		my $k_db = NFKD($k);
+		$k_db =~ s/\p{NonspacingMark}//g;
+		$k_db =~ s/[ \/]/_/g;
+
+		$row{$k_db} = $v;
 	}
 
-	print $row{"D\x{e1}tum uz\x{e1}vierky"} . "\n";
+	print $row{"Datum_uzavierky"} . "\n";
 
 	$dt->upsert (\%row);
 }
