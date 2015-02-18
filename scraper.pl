@@ -88,6 +88,26 @@ sub do_detail
 	$dt->upsert (\%row);
 }
 
+$dt->create_table(
+	{'Datum_uzavierky' => 'text',
+	'Miesto_vykonu_prace' => 'text',
+	'Organizacia' => 'text',
+	'Pozicia' => 'text',
+	'Stav' => 'text',
+	'Utvar_popis' => 'text',
+	'Vyhlasenie_konania' => 'text',
+	'Miesto_konania' => 'text',
+	'Obec' => 'text',
+	'PSC' => 'text',
+	'Tel_cislo' => 'text',
+	'Termin_konania' => 'text',
+	'Ulica_cislo_ulice' => 'text',
+	'Zlozenie_komisie' => 'text',
+	'Priebeh_konania' => 'text'},
+'swdata');
+
+$dt->create_index(['Vyhlasenie_konania'], undef, 'IF NOT EXISTS', 'UNIQUE');
+
 # Roll!
 $mech->get ($root);
 do {
@@ -107,5 +127,3 @@ do {
 		$mech = undef;
 	}
 } while ($mech);
-
-$dt->create_index(['Vyhlasenie_konania'], undef, 'IF NOT EXISTS', 'UNIQUE');
