@@ -43,33 +43,43 @@ sub do_detail
 	# </div>
 
 	my ($table) = $tree->look_down (class => 'DetailTable');
-	my @divs = $table->look_down (_tag => 'div', sub {
-		($_[0]->attr('class') || '') eq 'popiska'
-		or ($_[0]->attr('class') || '') eq 'hodnota'});
+	my @divs = $table->look_down (_tag => 'div');
 
 	my %row;
-	while (@divs >= 2) {
-		my $popiska = shift @divs;
-		my $hodnota = shift @divs;
+	my $popiska = '';
+	my $popiska_db = '';
+	my $hodnota = '';
 
-		my ($k, $v) = ($popiska->as_trimmed_text,
-			$hodnota->as_trimmed_text);
+	foreach my $div (@divs) {
+		my $class = ($div->attr('class') || '');
 
-		# Beautify a bit!
-		$k =~ s/:$//;
+		if ($class eq 'popiska') {
+			$popiska = $div->as_trimmed_text;
 
-		# Is the value a link? Absolutize it!
-		my ($link) = @{$hodnota->extract_links ('a')};
-		$v = new URI ($link->[0])->abs ($resp->request->uri)->as_string
-			if $link;
+			# Beautify a bit!
+			$popiska =~ s/:$//;
 
-		# Remove diacritics and remove spaces and slashes
-		# so we can use data from page to create columns
-		my $k_db = NFKD($k);
-		$k_db =~ s/\p{NonspacingMark}//g;
-		$k_db =~ s/[ \/]/_/g;
+			# Remove diacritics and remove spaces and slashes
+			# so we can use data from page to create columns
+			$popiska_db = NFKD($popiska);
+			$popiska_db =~ s/\p{NonspacingMark}//g;
+			$popiska_db =~ s/[ \/]/_/g;
+		} elsif ($class eq 'hodnota') {
+			$hodnota = $div->as_trimmed_text;
 
-		$row{$k_db} = $v;
+			# Is the value a link? Absolutize it!
+			my ($link) = @{$div->extract_links ('a')};
+			$hodnota = new URI ($link->[0])->abs ($resp->request->uri)->as_string
+				if $link;
+
+			if ($hodnota ne '') {
+				$row{$popiska_db} = $hodnota;
+			}
+
+			$popiska = '';
+			$popiska_db = '';
+			$hodnota = '';
+		}
 	}
 
 	print $row{"Datum_uzavierky"} . "\n";
@@ -97,4 +107,4 @@ do {
 	}
 } while ($mech);
 
-$dt->create_index(['Vyhlásenie konania'], undef, 'IF NOT EXISTS', 'UNIQUE');
+$dt->create_index(['Vyhlasenie_konania'], undef, 'IF NOT EXISTS', 'UNIQUE');
