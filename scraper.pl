@@ -64,6 +64,7 @@ sub do_detail
 			$popiska_db = NFKD($popiska);
 			$popiska_db =~ s/\p{NonspacingMark}//g;
 			$popiska_db =~ s/[ \/]/_/g;
+			$popiska_db =~ s/[\.,]//g;
 		} elsif ($class eq 'hodnota') {
 			$hodnota = $div->as_trimmed_text;
 
