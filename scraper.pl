@@ -4,8 +4,6 @@ use strict;
 use warnings;
 
 use URI;
-use FindBin;
-use lib $FindBin::Bin;
 use WWW::Mechanize;
 use HTML::TreeBuilder;
 use Database::DumpTruck;
