@@ -3,8 +3,40 @@
 use strict;
 use warnings;
 
-use URI;
+package Mechanize::Resilient;
+
+# The requests usually tak around 12s. The default LWP::UserAgent socket
+# activity timeout is 180s. However, sometimes we're unlucky and get no
+# response for 180s at all, while the subsequent request succeeds. Maybe
+# this is a rotten webserver behind a retarded balancer? No ides, let's
+# just try harder.
+
 use WWW::Mechanize;
+use base qw/WWW::Mechanize/;
+
+sub get
+{
+	my $resp;
+
+	foreach (0..3) {
+		$resp = WWW::Mechanize::get (@_);
+		last if $resp->is_success;
+		warn $resp->request->uri.': '.$resp->status_line;
+	}
+
+	return $resp;
+}
+
+sub new
+{
+	my $self = WWW::Mechanize::new (@_);
+	$self->timeout (60);
+	return bless $self;
+}
+
+package main;
+
+use URI;
 use HTML::TreeBuilder;
 use Database::DumpTruck;
 
@@ -12,7 +44,7 @@ use utf8;
 use Unicode::Normalize;
 
 my $root = new URI ('http://www.justice.gov.sk/Stranky/Ministerstvo/Vyberove-konania-v-rezorte/Zoznam-vyberovych-konani.aspx');
-my $mech = new WWW::Mechanize;
+my $mech = new Mechanize::Resilient;
 my $dt = new Database::DumpTruck ({ dbname => 'data.sqlite', table => 'swdata' });
 
 sub do_detail
