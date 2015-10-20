@@ -11,6 +11,7 @@ package Mechanize::Resilient;
 # this is a rotten webserver behind a retarded balancer? No ides, let's
 # just try harder.
 
+use LWP::ConnCache;
 use WWW::Mechanize;
 use base qw/WWW::Mechanize/;
 
@@ -31,6 +32,8 @@ sub new
 {
 	my $self = WWW::Mechanize::new (@_);
 	$self->timeout (60);
+	$self->conn_cache(LWP::ConnCache->new(
+        'total_capacity' => 0 ));
 	return bless $self;
 }
 
