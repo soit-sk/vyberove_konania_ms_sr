@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
 
 package Mechanize::Resilient;
 
