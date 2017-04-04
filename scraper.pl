@@ -60,11 +60,11 @@ sub do_detail
 	# This is what we deal with:
 	#
 	# <div  class="DetailTable">
-	#     <div class="popiska">Organizácia:</div>
+	#     <label class="popiska">Organizácia:</div>
 	#     <div class="hodnota">Okresný súd Košice I</div>
 	#     <div class="riadok"></div>
 	# 
-	#     <div class="popiska">Pozícia:</div>
+	#     <label class="popiska">Pozícia:</div>
 	#     <div class="hodnota">absolvenská prax</div>
 	#     <div class="riadok"></div>
 	# ...
@@ -77,7 +77,7 @@ sub do_detail
 	# </div>
 
 	my ($table) = $tree->look_down (class => 'DetailTable');
-	my @divs = $table->look_down (_tag => 'div');
+	my @divs = $table->look_down (_tag => qr/div|label/);
 
 	my %row;
 	my $popiska = '';
